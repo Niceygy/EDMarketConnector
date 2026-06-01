@@ -86,9 +86,19 @@ class PluginBrowserMixIn:
         self.selected_plugin: dict | None = None
         self._plugin_last_tested_label: nb.Label | None = None
 
-    # def dev_install_plugin(self, plugin) -> None:
-    #     """TEMP."""
-    #     print("Install", plugin.get("pluginName"))
+    def dev_install_plugin(self, plugin) -> None:
+        """Downloads a plugin from the URL at pluginZip and extracts it to the EDMC plugin folder"""
+        # print("Install", plugin.get("pluginName")) # replace this with a user popup?
+        plugin_filename = plugin.get("pluginZip").split("/")[-1]
+        logger.info(f"Downloading {plugin.get("pluginName")} to {plugin_filename}")
+        with requests.get(plugin.get("pluginZip"), stream=True) as r:
+            r.raise_for_status() # needs to be an EDMC error handler
+            with open(f"{config.plugin_dir}/{plugin_filename}", "wb") as f:
+                for chunk in r.iter_content(chunk_size=8192): 
+                    f.write(chunk)
+        logger.info(f"Download complete for {plugin_filename}, installing...")
+
+
     #
     # def dev_uninstall_plugin(self, plugin) -> None:
     #     """TEMP."""
@@ -297,6 +307,10 @@ class PluginBrowserMixIn:
                 # LANG: Open Plugin Repo
                 tr.tl("Open Plugin Repository"),
                 open_plugin_main,
+            ),
+            (
+                "Download",
+                self.dev_install_plugin
             ),
             # ("Install", self.dev_install_plugin),  # Upcoming Feature
             # ("Uninstall", self.dev_uninstall_plugin),  # Upcoming Feature
