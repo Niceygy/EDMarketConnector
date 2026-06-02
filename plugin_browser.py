@@ -98,18 +98,19 @@ class PluginBrowserMixIn:
         logger.info(f"Downloading {plugin_name} to {plugin_zipname}")
 
         with requests.get(plugin.get("pluginZip"), stream=True) as r:
-            r.raise_for_status() # needs to be an EDMC error handler
+            r.raise_for_status()  # needs to be an EDMC error handler
             with open(f"{config.plugin_dir}/{plugin_zipname}", "wb") as f:
-                for chunk in r.iter_content(chunk_size=8192): 
-                    #Save to file in chunks, avoids loading the whole thing into memory
+                for chunk in r.iter_content(chunk_size=8192):
+                    # Save to file in chunks, avoids loading the whole thing into memory
                     f.write(chunk)
 
-        #Extract to folder
-        logger.info(f"Download complete for {plugin_zipname}, installing...")
+        # Extract to folder
+        logger.info(f"Download complete for '{plugin_zipname}', installing...")
         shutil.unpack_archive(plugin_zip_destination, plugin_files_destination)
-        logger.info(f"Unpacked plugin to {plugin_files_destination}, restart EDMC to enable it.")
+        logger.info(
+            f"Unpacked plugin to '{plugin_files_destination}', restart EDMC to enable it."
+        )
 
-    
     # def dev_uninstall_plugin(self, plugin) -> None:
     #     """TEMP."""
     #     print("Uninstall", plugin.get("pluginName"))
@@ -195,9 +196,11 @@ class PluginBrowserMixIn:
         )
 
         # Configure row height to prevent text clipping
-        row_font = tkfont.Font(family='TkDefaultFont')
+        row_font = tkfont.Font(family="TkDefaultFont")
         style = ttk.Style()
-        style.configure("Treeview", rowheight=int(row_font.metrics()['linespace'] * 1.1))
+        style.configure(
+            "Treeview", rowheight=int(row_font.metrics()["linespace"] * 1.1)
+        )
 
         self.plugins_tree.heading(
             "name",
@@ -318,10 +321,7 @@ class PluginBrowserMixIn:
                 tr.tl("Open Plugin Repository"),
                 open_plugin_main,
             ),
-            (
-                "Download",
-                self.dev_install_plugin
-            ),
+            ("Download", self.dev_install_plugin),
             # ("Install", self.dev_install_plugin),  # Upcoming Feature
             # ("Uninstall", self.dev_uninstall_plugin),  # Upcoming Feature
             # ("Update", self.dev_update_plugin),  # Upcoming Feature
